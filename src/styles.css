@@ -1,0 +1,512 @@
+:root {
+  --bg: #f2f2f0;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --muted: #8a8a86;
+  --line: #e4e4e0;
+  --hover: #f0f0ed;
+  --accent: #2563eb;
+  --accent-soft: #e8efff;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app.drag-over .viewer {
+  outline: 2px dashed var(--accent);
+  outline-offset: -12px;
+}
+
+/* Toolbar */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.file-name {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 auto;
+}
+
+.sep {
+  width: 1px;
+  height: 20px;
+  background: var(--line);
+  margin: 0 6px;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.icon-btn.on {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.icon-btn:disabled,
+select:disabled,
+.color:has(input:disabled) {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.icon-btn.small {
+  width: 28px;
+  height: 28px;
+}
+
+.color {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.color:hover {
+  background: var(--hover);
+}
+
+.color input {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+}
+
+.color input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color input::-webkit-color-swatch {
+  border: 0;
+  border-radius: 50%;
+}
+
+.color input::-moz-color-swatch {
+  border: 0;
+  border-radius: 50%;
+}
+
+select {
+  height: 32px;
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--text);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: #333;
+}
+
+.save-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.error {
+  padding: 8px 16px;
+  background: #fdecec;
+  color: #a12020;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Viewer */
+
+.viewer {
+  flex: 1;
+  overflow: auto;
+  padding: 24px 16px 64px;
+}
+
+.empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.open-big {
+  padding: 12px 28px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.open-big:hover {
+  border-color: #ccc;
+}
+
+.page-wrap {
+  width: fit-content;
+  margin: 0 auto 28px;
+}
+
+.page-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  height: 30px;
+  color: var(--muted);
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.page-wrap:hover .page-bar {
+  opacity: 1;
+}
+
+.page-num {
+  margin-right: auto;
+  font-size: 12px;
+}
+
+.page {
+  position: relative;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.page canvas {
+  display: block;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: pan-x pan-y;
+}
+
+.overlay .ink {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.overlay.tool-text {
+  cursor: text;
+}
+
+.overlay.tool-draw {
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* Text boxes */
+
+.textbox {
+  position: absolute;
+  transform-origin: 0 0;
+}
+
+.textbox.disabled {
+  pointer-events: none;
+}
+
+.grow {
+  display: grid;
+}
+
+.grow::after,
+.grow textarea {
+  grid-area: 1 / 1;
+  font: inherit;
+  line-height: inherit;
+  white-space: pre;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 1ch;
+}
+
+.grow::after {
+  content: attr(data-value);
+  visibility: hidden;
+}
+
+.grow textarea {
+  color: inherit;
+  background: transparent;
+  resize: none;
+  overflow: hidden;
+  outline: none;
+}
+
+.grow textarea::placeholder {
+  color: inherit;
+  opacity: 0.35;
+}
+
+.textbox:hover .grow,
+.textbox.active .grow {
+  outline: 1px dashed rgba(37, 99, 235, 0.6);
+  outline-offset: 2px;
+}
+
+.textbox-tools {
+  position: absolute;
+  bottom: 100%;
+  left: -3px;
+  display: none;
+  gap: 2px;
+  padding-bottom: 4px;
+}
+
+.textbox:hover .textbox-tools,
+.textbox.active .textbox-tools {
+  display: flex;
+}
+
+.tb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tb-btn[title^='Move'] {
+  cursor: move;
+  touch-action: none;
+}
+
+.tb-btn:hover {
+  background: var(--hover);
+}
+
+/* Snap guides */
+
+.guide {
+  position: absolute;
+  pointer-events: none;
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+.guide.h {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.guide.v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+/* Selectable text (PDF text layer + OCR layer) */
+
+.toolbar,
+.page-bar {
+  user-select: none;
+}
+
+.textLayer,
+.ocrLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: clip;
+  line-height: 1;
+  text-align: initial;
+  transform-origin: 0 0;
+  forced-color-adjust: none;
+  --scale-round-x: 1px;
+  --scale-round-y: 1px;
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+
+.ocrLayer {
+  inset: 0;
+}
+
+.textLayer[data-main-rotation='90'] {
+  transform: rotate(90deg) translateY(-100%);
+}
+.textLayer[data-main-rotation='180'] {
+  transform: rotate(180deg) translate(-100%, -100%);
+}
+.textLayer[data-main-rotation='270'] {
+  transform: rotate(270deg) translateX(-100%);
+}
+
+.textLayer :is(span, br),
+.ocrLayer :is(span, br) {
+  position: absolute;
+  color: transparent;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0 0;
+  user-select: text;
+}
+
+.ocrLayer span {
+  font-family: sans-serif;
+}
+
+.textLayer > :not(.markedContent),
+.textLayer .markedContent span:not(.markedContent) {
+  --font-height: 0;
+  --scale-x: 1;
+  --rotate: 0deg;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+
+.textLayer .markedContent {
+  display: contents;
+}
+
+.textLayer span[role='img'] {
+  user-select: none;
+  cursor: default;
+}
+
+.textLayer ::selection,
+.ocrLayer ::selection {
+  background: rgba(37, 99, 235, 0.3);
+  color: transparent;
+}
+
+.textLayer br::selection,
+.ocrLayer br::selection {
+  background: transparent;
+}
+
+.textLayer .endOfContent {
+  display: block;
+  position: absolute;
+  inset: 100% 0 0;
+  user-select: none;
+}
+
+/* With no tool active, clicks go through to the text layers (except boxes). */
+.overlay.tool-none {
+  pointer-events: none;
+}
+
+.overlay.tool-none .textbox:not(.disabled) {
+  pointer-events: auto;
+}
+
+.text-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  margin-right: 6px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.text-btn:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.text-btn:disabled {
+  cursor: progress;
+}
